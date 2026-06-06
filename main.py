@@ -33,8 +33,10 @@ page = st.sidebar.radio("Navigate", ["Home", "Comments Analyzer", "Analytics", "
 # -------------------------------
 # Load Sentiment Model
 # -------------------------------
-model_path = r"C:\Users\hp\Comment Analyzer\Models\models--distilbert--distilbert-base-uncased-finetuned-sst-2-english\snapshots\714eb0fa89d2f80546fda750413ed43d93601a13"
-classifier = pipeline("text-classification", model=model_path)
+classifier = pipeline(
+    "sentiment-analysis",
+    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+)
 
 # Initialize session state
 if 'all_comments' not in st.session_state:
