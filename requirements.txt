@@ -1,3 +1,6 @@
 transformers>=4.36.2
 streamlit>=1.29.0
 torch
+pandas
+plotly
+fpdf
