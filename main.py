@@ -8,6 +8,24 @@ import json
 import os
 
 # -------------------------------
+# App styling
+# -------------------------------
+st.set_page_config(page_title="AI Comment Analyzer", page_icon="🤖", layout="wide")
+st.markdown("""
+<style>
+    .stApp { background: radial-gradient(ellipse at 70% 0%, #13202a 0%, #0c1117 48%, #0a0e13 100%); }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #111a22 0%, #0c1218 100%); border-right: 1px solid #26343c; }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 { color: #e8f0f4; }
+    .block-container { padding-top: 2.2rem; max-width: 1120px; }
+    h1, h2, h3 { letter-spacing: -0.025em; }
+    div[data-testid="stMetric"] { background: #121c24; border: 1px solid #26343c; padding: 1rem; border-radius: 14px; }
+    div[data-testid="stMetricLabel"] { color: #a9bac3; }
+    div.stButton > button { border-radius: 9px; }
+    [data-testid="stTabs"] button { font-weight: 600; }
+</style>
+""", unsafe_allow_html=True)
+
+# -------------------------------
 # Helper: Save & Load Comments
 # -------------------------------
 COMMENTS_FILE = "comments_data.json"
@@ -26,7 +44,7 @@ def load_comments():
 # -------------------------------
 # Sidebar Navigation
 # -------------------------------
-st.sidebar.image("https://copilot.microsoft.com/th/id/BCO.9ec3fa16-b461-462a-b63e-a1ad2721ef71.png", width=150)
+st.sidebar.image("assets/ai-dashboard.png", use_container_width=True)
 st.sidebar.title("AI Dashboard")
 page = st.sidebar.radio("Navigate", ["Home", "Comments Analyzer", "Analytics", "About"])
 
@@ -46,11 +64,19 @@ if 'all_comments' not in st.session_state:
 # HOME PAGE
 # -------------------------------
 if page == "Home":
-    st.markdown("<h2 style='text-align:center;color:#4CAF50;'>Welcome to AI Dashboard</h2>", unsafe_allow_html=True)
-    st.markdown("<hr style='border:1px solid #4CAF50;'>", unsafe_allow_html=True)
-    st.write("This dashboard analyzes comments using AI sentiment classification.")
-    st.image("https://copilot.microsoft.com/th/id/BCO.9ec3fa16-b461-462a-b63e-a1ad2721ef71.png", caption="AI Dashboard", width=500)
-    st.success("Navigate to 'Comments Analyzer' to start analyzing comments!")
+    st.markdown("<h1 style='text-align:center;color:#eaf3f7;margin-bottom:.25rem'>Understand the conversation</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;color:#a9bac3;font-size:1.08rem;margin-bottom:1.6rem'>AI-powered sentiment analysis for comments, made simple.</p>", unsafe_allow_html=True)
+    st.image("assets/ai-dashboard.png", use_container_width=True)
+    st.markdown("### Your comment insights, at a glance")
+    st.write("Add comments to classify sentiment, explore patterns, and export a clear report.")
+    total = len(st.session_state['all_comments'])
+    positive = sum(c['classification'] == 'POSITIVE' for c in st.session_state['all_comments'])
+    negative = sum(c['classification'] == 'NEGATIVE' for c in st.session_state['all_comments'])
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Comments analyzed", total)
+    m2.metric("Positive", positive)
+    m3.metric("Negative", negative)
+    st.info("Choose **Comments Analyzer** in the sidebar to add your first comment.")
 
 # -------------------------------
 # COMMENTS ANALYZER PAGE WITH TABS
