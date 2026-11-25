@@ -142,11 +142,11 @@ elif page == "Comments Analyzer":
                     accent_color = '#a9bac3'
 
                 comment_html = f"""
-                <div style="margin:12px 0;padding:16px 18px;border-radius:13px;
+                <div style="max-width:820px;margin:8px 0;padding:12px 15px;border-radius:12px;
                 border:1px solid #26343c;border-left:4px solid {accent_color};background:#121c24">
-                    <div style="font-weight:700;color:{accent_color};font-size:12px;letter-spacing:.06em;margin-bottom:7px">
+                    <div style="font-weight:700;color:{accent_color};font-size:11px;letter-spacing:.06em;margin-bottom:5px">
                         {html.escape(comment['classification'])}</div>
-                    <div style="font-size:15px;color:#e8f0f4;line-height:1.5;overflow-wrap:anywhere">
+                    <div style="font-size:14px;color:#e8f0f4;line-height:1.45;overflow-wrap:anywhere">
                         {html.escape(comment['comment'])}</div>
                 </div>
                 """
@@ -203,6 +203,13 @@ elif page == "Analytics":
     st.title("Sentiment Analytics")
     if st.session_state['all_comments']:
         df = pd.DataFrame(st.session_state['all_comments'])
+        positive_count = int((df['classification'] == 'POSITIVE').sum())
+        negative_count = int((df['classification'] == 'NEGATIVE').sum())
+        metric_cols = st.columns(3)
+        metric_cols[0].metric("Total comments", len(df))
+        metric_cols[1].metric("Positive", positive_count)
+        metric_cols[2].metric("Negative", negative_count)
+
         sentiment_counts = df['classification'].value_counts().reset_index()
         sentiment_counts.columns = ['Sentiment', 'Count']
 
@@ -211,17 +218,18 @@ elif page == "Analytics":
                          color_discrete_map={'POSITIVE':'#35c98b','NEGATIVE':'#ff7185'})
         fig_bar.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                               margin=dict(l=12, r=12, t=55, b=12), legend_title_text="")
-        st.plotly_chart(fig_bar, use_container_width=True)
-
         fig_pie = px.pie(sentiment_counts, names='Sentiment', values='Count',
                          title="Sentiment Breakdown", color='Sentiment',
-                         color_discrete_map={'POSITIVE':'#4CAF50','NEGATIVE':'#F44336'})
+                         color_discrete_map={'POSITIVE':'#35c98b','NEGATIVE':'#ff7185'})
         fig_pie.update_layout(paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=12, r=12, t=55, b=12),
                               legend_title_text="")
-        st.plotly_chart(fig_pie, use_container_width=True)
+        chart_cols = st.columns(2)
+        with chart_cols[0]:
+            st.plotly_chart(fig_bar, use_container_width=True)
+        with chart_cols[1]:
+            st.plotly_chart(fig_pie, use_container_width=True)
 
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download Comments Data (CSV)", csv, "comments_sentiment.csv", "text/csv")
 
         pdf = FPDF()
         pdf.add_page()
@@ -236,7 +244,11 @@ elif page == "Analytics":
         for i, row in df.iterrows():
             pdf.multi_cell(0, 10, f"{row['classification']}: {row['comment']}")
         pdf_output = io.BytesIO(pdf.output(dest='S').encode('latin-1'))
-        st.download_button("📄 Download PDF Report", pdf_output, "sentiment_report.pdf", "application/pdf")
+        export_cols = st.columns(2)
+        with export_cols[0]:
+            st.download_button("📥 Download CSV", csv, "comments_sentiment.csv", "text/csv", use_container_width=True)
+        with export_cols[1]:
+            st.download_button("📄 Download PDF Report", pdf_output, "sentiment_report.pdf", "application/pdf", use_container_width=True)
 
     else:
         st.warning("No comments added yet. Go to 'Comments Analyzer' to add some!")
