@@ -89,7 +89,9 @@ if 'all_comments' not in st.session_state:
 if page == "Home":
     st.markdown("<h1 style='text-align:center;color:#eaf3f7;margin-bottom:.25rem'>Understand the conversation</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;color:#a9bac3;font-size:1.08rem;margin-bottom:1.6rem'>AI-powered sentiment analysis for comments, made simple.</p>", unsafe_allow_html=True)
-    st.image("assets/ai-dashboard.png", use_container_width=True)
+    _, banner_col, _ = st.columns([2, 7, 2])
+    with banner_col:
+        st.image("assets/ai-dashboard.png", use_container_width=True)
     st.markdown("### Your comment insights, at a glance")
     st.write("Add comments to classify sentiment, explore patterns, and export a clear report.")
     total = len(st.session_state['all_comments'])
