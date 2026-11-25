@@ -17,7 +17,8 @@ st.markdown("""
     .stApp { background: radial-gradient(ellipse at 70% 0%, #13202a 0%, #0c1117 48%, #0a0e13 100%); }
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #111a22 0%, #0c1218 100%); border-right: 1px solid #26343c; }
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2 { color: #e8f0f4; }
-    .block-container { padding-top: 2.2rem; max-width: 1120px; }
+    .block-container { padding-top: .8rem; max-width: 1120px; }
+    .block-container h1 { margin-top: .25rem; }
     h1, h2, h3 { letter-spacing: -0.025em; }
     div[data-testid="stMetric"] { background: #121c24; border: 1px solid #26343c; padding: 1rem; border-radius: 14px; }
     div[data-testid="stMetricLabel"] { color: #a9bac3; }
@@ -26,13 +27,13 @@ st.markdown("""
     [data-testid="stImage"] img { border-radius: 14px; }
     div[data-testid="stDownloadButton"] button { width: 100%; }
     @media (max-width: 768px) {
-        .block-container { padding: 1.5rem 1.25rem 2rem; }
+        .block-container { padding: .9rem 1.25rem 2rem; }
         [data-testid="stSidebar"] img { max-width: 230px; margin: 0 auto; }
         [data-testid="stTabs"] [data-baseweb="tab-list"] { gap: .15rem; }
         [data-testid="stTabs"] button { padding: .55rem .7rem; }
     }
     @media (max-width: 480px) {
-        .block-container { padding: 1rem .8rem 1.5rem; }
+        .block-container { padding: .75rem .8rem 1.5rem; }
         h1 { font-size: 1.8rem !important; line-height: 1.15 !important; }
         h2 { font-size: 1.45rem !important; }
         [data-testid="stTabs"] [data-baseweb="tab-list"] { overflow-x: auto; }
