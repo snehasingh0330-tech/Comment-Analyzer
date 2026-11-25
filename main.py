@@ -6,6 +6,7 @@ from fpdf import FPDF
 import io
 import json
 import os
+import html
 
 # -------------------------------
 # App styling
@@ -22,6 +23,24 @@ st.markdown("""
     div[data-testid="stMetricLabel"] { color: #a9bac3; }
     div.stButton > button { border-radius: 9px; }
     [data-testid="stTabs"] button { font-weight: 600; }
+    [data-testid="stImage"] img { border-radius: 14px; }
+    div[data-testid="stDownloadButton"] button { width: 100%; }
+    @media (max-width: 768px) {
+        .block-container { padding: 1.5rem 1.25rem 2rem; }
+        [data-testid="stSidebar"] img { max-width: 230px; margin: 0 auto; }
+        [data-testid="stTabs"] [data-baseweb="tab-list"] { gap: .15rem; }
+        [data-testid="stTabs"] button { padding: .55rem .7rem; }
+    }
+    @media (max-width: 480px) {
+        .block-container { padding: 1rem .8rem 1.5rem; }
+        h1 { font-size: 1.8rem !important; line-height: 1.15 !important; }
+        h2 { font-size: 1.45rem !important; }
+        [data-testid="stTabs"] [data-baseweb="tab-list"] { overflow-x: auto; }
+        [data-testid="stTabs"] button { white-space: nowrap; }
+        div[data-testid="stMetric"] { padding: .8rem; }
+        div[data-testid="stMetricValue"] { font-size: 1.5rem; }
+        div.stButton > button, div[data-testid="stDownloadButton"] button { min-height: 44px; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,10 +70,14 @@ page = st.sidebar.radio("Navigate", ["Home", "Comments Analyzer", "Analytics", "
 # -------------------------------
 # Load Sentiment Model
 # -------------------------------
-classifier = pipeline(
-    "sentiment-analysis",
-    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
-)
+@st.cache_resource(show_spinner="Loading the sentiment model…")
+def load_classifier():
+    return pipeline(
+        "sentiment-analysis",
+        model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+    )
+
+classifier = load_classifier()
 
 # Initialize session state
 if 'all_comments' not in st.session_state:
@@ -109,32 +132,32 @@ elif page == "Comments Analyzer":
 
         def display_comments(comments):
             for idx, comment in enumerate(comments):
-                # Darker shades for better contrast
                 if comment['classification'] == 'POSITIVE':
-                    bg_color = '#7FB77E'  # darker green
+                    accent_color = '#35c98b'
                 elif comment['classification'] == 'NEGATIVE':
-                    bg_color = '#D98880'  # darker red
+                    accent_color = '#ff7185'
                 else:
-                    bg_color = '#CFCFCF'  # neutral gray
+                    accent_color = '#a9bac3'
 
                 comment_html = f"""
-                <div style="margin:10px;padding:15px;border-radius:10px;
-                box-shadow:0px 4px 10px rgba(0,0,0,0.2);
-                background-color:{bg_color};padding-left:25px;padding-top:15px;padding-bottom:15px">
-                    <div style="font-weight:bold;color:#222;font-size:16px;">👤 Username</div>
-                    <div style="font-size:15px;color:#000;">{comment['comment']}</div>
+                <div style="margin:12px 0;padding:16px 18px;border-radius:13px;
+                border:1px solid #26343c;border-left:4px solid {accent_color};background:#121c24">
+                    <div style="font-weight:700;color:{accent_color};font-size:12px;letter-spacing:.06em;margin-bottom:7px">
+                        {html.escape(comment['classification'])}</div>
+                    <div style="font-size:15px;color:#e8f0f4;line-height:1.5;overflow-wrap:anywhere">
+                        {html.escape(comment['comment'])}</div>
                 </div>
                 """
                 st.write(comment_html, unsafe_allow_html=True)
 
-                col1, col2 = st.columns([0.15, 0.15])
+                col1, col2 = st.columns(2)
                 with col1:
-                    if st.button("✏️ Edit", key=f"edit_{idx}"):
+                    if st.button("✏️ Edit", key=f"edit_{idx}", use_container_width=True):
                         st.session_state['edit_index'] = idx
                         st.session_state['edit_text'] = comment['comment']
                         st.rerun()
                 with col2:
-                    if st.button("🗑️ Delete", key=f"delete_{idx}"):
+                    if st.button("🗑️ Delete", key=f"delete_{idx}", use_container_width=True):
                         st.session_state['all_comments'].pop(idx)
                         save_comments()
                         st.rerun()
@@ -182,13 +205,18 @@ elif page == "Analytics":
         sentiment_counts.columns = ['Sentiment', 'Count']
 
         fig_bar = px.bar(sentiment_counts, x='Sentiment', y='Count', color='Sentiment',
-                         title="Sentiment Distribution", template="plotly_dark")
-        st.plotly_chart(fig_bar)
+                         title="Sentiment Distribution", template="plotly_dark",
+                         color_discrete_map={'POSITIVE':'#35c98b','NEGATIVE':'#ff7185'})
+        fig_bar.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                              margin=dict(l=12, r=12, t=55, b=12), legend_title_text="")
+        st.plotly_chart(fig_bar, use_container_width=True)
 
         fig_pie = px.pie(sentiment_counts, names='Sentiment', values='Count',
                          title="Sentiment Breakdown", color='Sentiment',
                          color_discrete_map={'POSITIVE':'#4CAF50','NEGATIVE':'#F44336'})
-        st.plotly_chart(fig_pie)
+        fig_pie.update_layout(paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=12, r=12, t=55, b=12),
+                              legend_title_text="")
+        st.plotly_chart(fig_pie, use_container_width=True)
 
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Download Comments Data (CSV)", csv, "comments_sentiment.csv", "text/csv")
