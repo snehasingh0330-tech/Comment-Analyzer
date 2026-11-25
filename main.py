@@ -260,10 +260,10 @@ elif page == "Analytics":
 elif page == "About":
     st.title("About This Dashboard")
     st.markdown("""
-    **Developers:** Sneha Singh and Prerna Chahar<br>
-    **Purpose:** project demonstrating AI‑powered sentiment analysis<br>
-    **Tools Used:** Streamlit, HuggingFace Transformers, Plotly, FPDF
-    """)
+    <p><strong>Developers:</strong> Sneha Singh and Prerna Chahar<br>
+    <strong>Purpose:</strong> Project demonstrating AI-powered sentiment analysis<br>
+    <strong>Tools Used:</strong> Streamlit, HuggingFace Transformers, Plotly, FPDF</p>
+    """, unsafe_allow_html=True)
     st.markdown("<hr style='border:1px solid #4CAF50;'>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;color:#4CAF50;'>Thank you for visiting the AI Dashboard!</p>", unsafe_allow_html=True)
 
