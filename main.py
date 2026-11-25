@@ -260,7 +260,7 @@ elif page == "Analytics":
 elif page == "About":
     st.title("About This Dashboard")
     st.markdown("""
-    **Developer:** Sneha  
+    **Developers:** Sneha Singh and Prerna Chahar  
     **Purpose:** project demonstrating AI‑powered sentiment analysis  
     **Tools Used:** Streamlit, HuggingFace Transformers, Plotly, FPDF  
     """)
